@@ -38,8 +38,7 @@ export function Sidebar({ user }: SidebarProps) {
       href: "/projects",
       icon: FolderKanban,
       active: pathname.startsWith("/projects"),
-      isReady: false,
-      badge: "Phase 3",
+      isReady: true,
     },
     {
       name: "My Tasks",

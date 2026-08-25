@@ -1,5 +1,6 @@
 import React from "react";
 import { getCurrentUser } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
 import {
   FolderKanban,
   CheckCircle2,
@@ -8,6 +9,7 @@ import {
   Sparkles,
   ShieldCheck,
 } from "lucide-react";
+import { ProjectStatus } from "@prisma/client";
 
 export const metadata = {
   title: "Dashboard - Project Tracker",
@@ -16,10 +18,19 @@ export const metadata = {
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 
+  const projectCount = user
+    ? await prisma.project.count({
+        where: {
+          OR: [{ userId: user.id }, { members: { some: { userId: user.id } } }],
+          status: { not: ProjectStatus.ARCHIVED },
+        },
+      })
+    : 0;
+
   const metrics = [
     {
       title: "Total Projects",
-      value: "0",
+      value: projectCount.toString(),
       description: "Active workspaces",
       icon: FolderKanban,
       color: "text-blue-600 dark:text-blue-400",

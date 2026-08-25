@@ -43,8 +43,7 @@ export function MobileNav({ isOpen, onClose, user }: MobileNavProps) {
       href: "/projects",
       icon: FolderKanban,
       active: pathname.startsWith("/projects"),
-      isReady: false,
-      badge: "Phase 3",
+      isReady: true,
     },
     {
       name: "My Tasks",
