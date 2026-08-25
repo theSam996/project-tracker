@@ -20,6 +20,7 @@ interface ListPageProps {
     priority?: string;
     assignee?: string;
     sort?: string;
+    q?: string;
   }>;
 }
 
@@ -46,7 +47,7 @@ export default async function ProjectListPage({
   }
 
   const { projectId } = await params;
-  const { status, priority, assignee, sort } = await searchParams;
+  const { status, priority, assignee, sort, q } = await searchParams;
 
   const [data, membersData, projectOwner] = await Promise.all([
     getProjectTasks({
@@ -56,6 +57,7 @@ export default async function ProjectListPage({
       priority,
       assigneeId: assignee,
       sort,
+      q,
     }),
     prisma.projectMember.findMany({
       where: { projectId },

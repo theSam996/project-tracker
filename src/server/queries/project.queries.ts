@@ -60,7 +60,7 @@ export async function getProjects({
     where.status = { not: ProjectStatus.ARCHIVED };
   }
 
-  // Search filtering (by name or key)
+  // Search filtering (by name, key, or description)
   if (q && q.trim().length > 0) {
     const searchTerm = q.trim();
     where.AND = [
@@ -68,6 +68,7 @@ export async function getProjects({
         OR: [
           { name: { contains: searchTerm, mode: "insensitive" } },
           { key: { contains: searchTerm, mode: "insensitive" } },
+          { description: { contains: searchTerm, mode: "insensitive" } },
         ],
       },
     ];

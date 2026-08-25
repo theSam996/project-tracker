@@ -36,6 +36,7 @@ export interface GetProjectTasksParams {
   priority?: string;
   assigneeId?: string;
   sort?: string;
+  q?: string;
 }
 
 export async function getProjectTasks({
@@ -45,6 +46,7 @@ export async function getProjectTasks({
   priority,
   assigneeId,
   sort,
+  q,
 }: GetProjectTasksParams): Promise<{
   tasks: TaskItem[];
   project: { id: string; name: string; key: string };
@@ -73,6 +75,26 @@ export async function getProjectTasks({
     } else {
       where.userId = assigneeId;
     }
+  }
+
+  // Search filter (by title, description, or task identifier)
+  if (q && q.trim().length > 0) {
+    const searchTerm = q.trim();
+    const numberMatch = searchTerm.match(/^(?:[a-zA-Z0-9]+-)?(\d+)$/);
+    const parsedNumber = numberMatch ? parseInt(numberMatch[1], 10) : null;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const searchConditions: any[] = [
+      { title: { contains: searchTerm, mode: "insensitive" } },
+      { description: { contains: searchTerm, mode: "insensitive" } },
+    ];
+
+    if (parsedNumber !== null && !isNaN(parsedNumber)) {
+      searchConditions.push({ taskNumber: parsedNumber });
+    }
+
+    where.AND = where.AND || [];
+    where.AND.push({ OR: searchConditions });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

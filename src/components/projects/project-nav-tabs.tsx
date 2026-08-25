@@ -15,10 +15,19 @@ interface ProjectNavTabsProps {
   projectId: string;
 }
 
+interface NavTab {
+  name: string;
+  href: string;
+  icon: React.ElementType;
+  active: boolean;
+  isReady: boolean;
+  badge?: string;
+}
+
 export function ProjectNavTabs({ projectId }: ProjectNavTabsProps) {
   const pathname = usePathname();
 
-  const tabs = [
+  const tabs: NavTab[] = [
     {
       name: "Overview",
       href: `/projects/${projectId}`,
@@ -45,8 +54,7 @@ export function ProjectNavTabs({ projectId }: ProjectNavTabsProps) {
       href: `/projects/${projectId}/analytics`,
       icon: BarChart3,
       active: pathname.startsWith(`/projects/${projectId}/analytics`),
-      isReady: false,
-      badge: "Phase 5",
+      isReady: true,
     },
     {
       name: "Settings",

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { GlobalSearchDialog } from "@/components/layout/global-search-dialog";
 
 interface TopbarProps {
   user: {
@@ -44,12 +45,14 @@ export function Topbar({ user }: TopbarProps) {
               Workspace Overview
             </h1>
             <p className="hidden sm:block text-xs text-slate-500 dark:text-slate-400">
-              Project Tracker &bull; Phase 2 Foundation
+              Project Tracker &bull; Enterprise Workspace
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+          <GlobalSearchDialog />
+
           <ThemeToggle />
 
           <div className="h-5 w-px bg-slate-200 dark:bg-slate-800" aria-hidden="true" />
