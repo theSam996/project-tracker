@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const SECRET_KEY = process.env.AUTH_SECRET || "fallback-secret-key-at-least-32-characters-long-12345";
-const key = new TextEncoder().encode(SECRET_KEY);
+import { getAuthSecretKey } from "@/lib/session";
 
 const PROTECTED_PREFIXES = ["/dashboard", "/projects", "/tasks", "/settings"];
 const AUTH_PREFIXES = ["/login", "/register"];
@@ -16,7 +15,7 @@ export async function middleware(request: NextRequest) {
 
   if (token) {
     try {
-      await jwtVerify(token, key, { algorithms: ["HS256"] });
+      await jwtVerify(token, getAuthSecretKey(), { algorithms: ["HS256"] });
       isAuthenticated = true;
     } catch {
       isAuthenticated = false;

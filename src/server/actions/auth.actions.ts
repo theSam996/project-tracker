@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { createSession, deleteSession } from "@/lib/session";
+import { checkRateLimit } from "@/lib/rate-limit";
 import {
   RegisterSchema,
   LoginSchema,
@@ -29,6 +30,15 @@ export async function registerUser(input: RegisterInput): Promise<AuthActionResu
   }
 
   const { name, email, password } = validation.data;
+
+  // Rate limiting: max 10 registration attempts per minute per email
+  const rateLimit = checkRateLimit(`register:${email.toLowerCase()}`, 10, 60 * 1000);
+  if (!rateLimit.success) {
+    return {
+      success: false,
+      error: `Too many registration attempts. Please wait ${rateLimit.resetInSeconds} seconds before trying again.`,
+    };
+  }
 
   try {
     const existingUser = await prisma.user.findUnique({
@@ -75,6 +85,15 @@ export async function loginUser(input: LoginInput): Promise<AuthActionResult> {
   }
 
   const { email, password } = validation.data;
+
+  // Rate limiting: max 8 login attempts per minute per email
+  const rateLimit = checkRateLimit(`login:${email.toLowerCase()}`, 8, 60 * 1000);
+  if (!rateLimit.success) {
+    return {
+      success: false,
+      error: `Too many login attempts. Please wait ${rateLimit.resetInSeconds} seconds before trying again.`,
+    };
+  }
 
   try {
     const user = await prisma.user.findUnique({

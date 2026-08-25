@@ -2,8 +2,19 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
-const SECRET_KEY = process.env.AUTH_SECRET || "fallback-secret-key-at-least-32-characters-long-12345";
-const key = new TextEncoder().encode(SECRET_KEY);
+export function getAuthSecretKey(): Uint8Array {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret || secret.trim().length === 0) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("AUTH_SECRET environment variable is missing or empty in production.");
+    }
+    return new TextEncoder().encode("fallback-development-secret-key-at-least-32-chars-long-12345");
+  }
+  if (secret.length < 32 && process.env.NODE_ENV === "production") {
+    throw new Error("AUTH_SECRET must be at least 32 characters in production.");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 const SESSION_COOKIE_NAME = "session";
 const SESSION_EXPIRATION_TIME = "7d";
@@ -20,6 +31,7 @@ export interface SessionPayload {
  * Sign a JWT session token with Web Crypto (Edge & Node compatible)
  */
 export async function signSessionToken(payload: SessionPayload): Promise<string> {
+  const key = getAuthSecretKey();
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -32,6 +44,7 @@ export async function signSessionToken(payload: SessionPayload): Promise<string>
  */
 export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
+    const key = getAuthSecretKey();
     const { payload } = await jwtVerify(token, key, {
       algorithms: ["HS256"],
     });
