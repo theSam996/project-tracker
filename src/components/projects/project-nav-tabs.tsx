@@ -31,16 +31,14 @@ export function ProjectNavTabs({ projectId }: ProjectNavTabsProps) {
       href: `/projects/${projectId}/board`,
       icon: Kanban,
       active: pathname.startsWith(`/projects/${projectId}/board`),
-      isReady: false,
-      badge: "Phase 4",
+      isReady: true,
     },
     {
       name: "List",
       href: `/projects/${projectId}/list`,
       icon: ListTodo,
       active: pathname.startsWith(`/projects/${projectId}/list`),
-      isReady: false,
-      badge: "Phase 4",
+      isReady: true,
     },
     {
       name: "Analytics",
